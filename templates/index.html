@@ -7,11 +7,12 @@
         body { font-family: sans-serif; background: #2c3e50; color: #ecf0f1; text-align: center; padding-top: 50px; }
         h1 { color: #f1c40f; }
         input { padding: 10px; margin: 5px; font-size: 16px; border-radius: 5px; border: none; }
-        button { padding: 15px 30px; font-size: 20px; background: #e67e22; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    button { padding: 15px 30px; font-size: 20px; background: #e67e22; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
     </style>
 </head>
 <body>
-    <h1>Setup Jocul Cuvintelor</h1>
+    <h1>JOCUL CUVINTELOR</h1>
     <h3>Introduceți numele celor 5 jucători:</h3>
     <form id="setup-form">
         <input type="text" id="player1" placeholder="Jucator 1" required><br>
@@ -23,23 +24,45 @@
     </form>
     <p style="margin-top: 20px;">
         După ce dați start, deschideți ecranul de joc și cel de prezentator în tab-uri noi:<br>
-        <a href="/joc" target="_blank">Ecran Jucător</a> | 
-        <a href="/prezentator" target="_blank">Ecran Prezentator</a>
+    <a href="/joc" target="_blank">Ecran Jucător</a> | 
+    <a href="/prezentator" target="_blank">Ecran Prezentator</a> |
+    <a href="/buton-rosu" target="_blank">Buton Roșu (telefon)</a>
     </p>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script>
+        // Keep a persistent socket connection for auto-reload and actions
+        const socket = io();
+
+        // Auto-reload when server notifies about template/static changes
+        socket.on('reload', () => {
+            window.location.reload();
+        });
+
         document.getElementById('setup-form').addEventListener('submit', function(e) {
             e.preventDefault();
+            const form = this;
+            const submitBtn = form.querySelector('button[type="submit"]');
+
+            // Respect HTML5 validation (required fields)
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            if (submitBtn.disabled) return; // already started
+
+            // Disable UI to prevent multiple starts
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Joc pornit...';
+            form.querySelectorAll('input').forEach(inp => inp.disabled = true);
+
             const players = [];
             for (let i = 1; i <= 5; i++) {
                 players.push(document.getElementById('player' + i).value);
             }
-            const socket = io();
-            socket.on('connect', () => {
-                socket.emit('start_game', { players: players });
-                alert('Jocul a fost configurat! Deschideți celelalte ecrane.');
-            });
+            socket.emit('start_game', { players: players });
+            alert('Jocul a fost configurat! Deschideți celelalte ecrane.');
         });
     </script>
 </body>
