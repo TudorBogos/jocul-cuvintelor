@@ -3,40 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <title>Jocul Cuvintelor - Jucător</title>
+    <link rel="stylesheet" href="/static/tv.css">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #34495e; color: white; text-align: center; }
-        .container { max-width: 900px; margin: auto; padding: 20px; }
-        .header { display: flex; justify-content: space-between; align-items: center; font-size: 2em; padding: 10px; background: #2c3e50; border-radius: 10px; }
-        .timer { color: #f1c40f; }
-        .score { color: #2ecc71; }
-        .definition { margin-top: 40px; font-size: 1.5em; min-height: 80px; }
-        .word-display { margin: 40px 0; font-size: 3em; letter-spacing: 15px; color: #e74c3c; font-weight: bold; }
-        .actions button { padding: 20px 40px; font-size: 1.5em; margin: 10px; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s, opacity 0.3s; }
-        #btn-letter { background-color: #3498db; color: white; }
-        #btn-red-button { background-color: #c0392b; color: white; }
-        .actions button:disabled { background-color: #7f8c8d; cursor: not-allowed; opacity: 0.5; }
-        #answer-timer-display { font-size: 2.5em; color: #e67e22; margin-top: 15px; height: 40px; }
-        .message-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; font-size: 2.5em; z-index: 100; text-align: center;}
-        .feedback { font-size: 1.8em; margin-top: 20px; height: 50px; }
+        @import url('/pictures/logo.png'); /* noop to avoid CSP warnings if any */
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div id="player-name">Așteptare jucător...</div>
-            <div class="timer" id="main-timer">4:00</div>
-            <div class="score" id="player-score">0 lei</div>
+    <div class="tv-wrap">
+        <div class="tv-header">
+            <img src="/pictures/logo.png" alt="Jocul Cuvintelor" />
         </div>
-
-        <div class="definition" id="definition-text">Așteptare cuvânt...</div>
-        <div class="word-display" id="word-placeholder"></div>
-        <div class="feedback" id="feedback-message"></div>
-
-        <div id="answer-timer-display"></div>
-
-        <div class="actions" id="game-actions">
-            <button id="btn-letter" disabled>Cer o Literă</button>
-            <button id="btn-red-button" disabled>Butonul Roșu</button>
+        <div class="tv-panel">
+            <div class="tv-row" style="font-size:22px; margin-bottom:10px">
+                <span id="player-name" class="chip">Așteptare jucător...</span>
+                <span class="timer" id="main-timer">4:00</span>
+                <span class="score" id="player-score">0 lei</span>
+            </div>
+            <div class="tv-def" id="definition-text">Așteptare cuvânt...</div>
+            <div class="tv-big" id="word-placeholder">&nbsp;</div>
+            <div class="tv-row" style="margin-top:14px">
+                <span id="answer-timer-display" class="chip" style="min-width:220px; text-align:center"></span>
+                <span id="feedback-message" style="flex:1; text-align:center"></span>
+            </div>
+        </div>
+        <div style="margin-top:14px; text-align:center; opacity:0.8; font-size:14px">
+            Butonul Roșu se află pe telefon: <a href="/buton-rosu" target="_blank">/buton-rosu</a>
         </div>
     </div>
     
@@ -45,6 +36,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script>
         const socket = io();
+
+        // Auto-reload on server notification (dev convenience)
+        socket.on('reload', () => {
+            window.location.reload();
+        });
 
         // Elementele DOM
         const playerNameEl = document.getElementById('player-name');
@@ -55,8 +51,7 @@
         const feedbackEl = document.getElementById('feedback-message');
         const messageOverlay = document.getElementById('message-overlay');
         const answerTimerDisplay = document.getElementById('answer-timer-display');
-        const btnLetter = document.getElementById('btn-letter');
-        const btnRedButton = document.getElementById('btn-red-button');
+    // Butonul Roșu nu mai există aici
 
         function formatTime(seconds) {
             const min = Math.floor(seconds / 60);
@@ -64,9 +59,7 @@
             return `${min}:${sec < 10 ? '0' : ''}${sec}`;
         }
 
-        // Listeneri pentru butoane
-        btnLetter.addEventListener('click', () => socket.emit('request_letter'));
-        btnRedButton.addEventListener('click', () => socket.emit('press_red_button'));
+    // Butonul Roșu a fost mutat pe o pagină separată (accesată de pe telefon)
 
         // --- Evenimente primite de la server ---
         socket.on('update_jucator', (data) => {
@@ -77,8 +70,7 @@
             
             // Logica de blocare/deblocare butoane
             const butoane = data.stare_butoane.jucator;
-            btnLetter.disabled = !butoane.cer_litera;
-            btnRedButton.disabled = !butoane.buton_rosu;
+            // Butonul pentru literă a fost mutat la prezentator. Butonul roșu e pe /buton-rosu.
 
             if (data.stare_butoane.prezentator.validare) {
                 feedbackEl.innerHTML = `<i>Așteptare validare răspuns...</i>`;
@@ -115,7 +107,7 @@
             }
         });
 
-        socket.on('game_over', (data) => {
+    socket.on('game_over', (data) => {
             document.querySelector('.container').innerHTML = '<h1>Joc Terminat!</h1>';
             const scoresContainer = document.createElement('div');
             let scoresHtml = '<h2>Clasament Final</h2><ul style="list-style:none; padding:0; font-size:1.5em;">';

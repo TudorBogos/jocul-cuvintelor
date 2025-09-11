@@ -1,0 +1,30 @@
+/* Minimal theme inspired by Jocul Cuvintelor look */
+:root{
+  --bg1:#0a0f24; /* deep navy */
+  --bg2:#0e1633; /* gradient stop */
+  --panel:#121a3b;
+  --accent:#f6c90e; /* golden */
+  --accent2:#e74c3c; /* red */
+  --text:#eef2ff;
+}
+html,body{height:100%}
+body{
+  margin:0; color:var(--text);
+  background: radial-gradient(1200px 800px at 50% -20%, #1b2458 0%, var(--bg2) 40%, var(--bg1) 100%);
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.tv-wrap{max-width:1100px;margin:0 auto;padding:24px}
+.tv-header{display:flex;align-items:center;gap:16px;justify-content:center;margin-bottom:16px}
+.tv-header img{height:72px;filter: drop-shadow(0 6px 10px rgba(0,0,0,0.5));}
+.tv-panel{background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:20px; box-shadow:0 20px 40px rgba(0,0,0,0.35)}
+.tv-title{color:var(--accent); text-transform:uppercase; letter-spacing:1px; text-align:center}
+.tv-big{font-size:46px; letter-spacing:0.2em; color:var(--accent2); font-weight:800; text-align:center}
+.tv-def{font-size:22px; min-height:90px; text-align:center}
+.tv-row{display:flex; align-items:center; justify-content:space-between; gap:16px}
+.chip{background:rgba(255,255,255,0.06); padding:10px 14px; border-radius:999px; font-weight:600}
+.btn{border:none; border-radius:10px; padding:14px 22px; font-size:18px; cursor:pointer; color:#0b0f1a; font-weight:700}
+.btn:disabled{opacity:0.6; cursor:not-allowed}
+.btn-gold{background:linear-gradient(180deg,#ffd84d,#e7b90d)}
+.btn-red{background:linear-gradient(180deg,#ff6b6b,#e63939); color:#fff}
+.timer{color:#ffd84d; font-weight:700}
+.score{color:#22e3a2; font-weight:700}
